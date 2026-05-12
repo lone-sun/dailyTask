@@ -5,4 +5,4 @@ jobs:
   dailysign:
     runs-on: ubuntu-latest
     steps:
-      - run: python dailysign
+      - run: python checkin.py
