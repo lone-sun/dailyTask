@@ -2,7 +2,8 @@ name: Daily Checkin
 
 on:
   schedule:
-    - cron: "0 16 * * *"
+    - cron: "5 12 * * *"
+      timezone: "Asia/Shanghai"
   workflow_dispatch:
 
 permissions:
