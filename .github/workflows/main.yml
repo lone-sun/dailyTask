@@ -1,12 +1,8 @@
 on: 
   schedule:
-  - cron: "30 2 * * *"
+  - cron: "40 2 * * *"
 jobs:
   dailysign:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'
-      - run: python checkin.py
+      - run: git commit --allow-empty -m "active"
