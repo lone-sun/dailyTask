@@ -69,16 +69,30 @@ def main():
 
     token = None
 
-    while True:
-        try:
-            # 确保 token 有效
-            if not token:
-                token = login()
 
-            # 执行签到
+    try:
+        # 确保 token 有效
+        if not token:
+            token = login()
+
+        # 执行签到
+        result = checkin(token)
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        if result.get("code") == 0:
+            d = result.get("data", {})
+            log.info(
+                "[%s] 签到成功! 连续 %d 天, 奖励: %s",
+                now,
+                d.get("consecutive", 0),
+                d.get("reward_display", "unknown"),
+            )
+        elif result.get("code") == 7:
+            # token 过期，重新登录
+            log.warning("[%s] Token 过期，重新登录...", now)
+            token = login()
+            # 用新 token 重试签到
             result = checkin(token)
-            now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
             if result.get("code") == 0:
                 d = result.get("data", {})
                 log.info(
@@ -87,34 +101,20 @@ def main():
                     d.get("consecutive", 0),
                     d.get("reward_display", "unknown"),
                 )
-            elif result.get("code") == 7:
-                # token 过期，重新登录
-                log.warning("[%s] Token 过期，重新登录...", now)
-                token = login()
-                # 用新 token 重试签到
-                result = checkin(token)
-                if result.get("code") == 0:
-                    d = result.get("data", {})
-                    log.info(
-                        "[%s] 签到成功! 连续 %d 天, 奖励: %s",
-                        now,
-                        d.get("consecutive", 0),
-                        d.get("reward_display", "unknown"),
-                    )
-                else:
-                    log.warning("[%s] 重试签到返回: %s", now, result.get("msg"))
             else:
-                log.warning("[%s] 签到返回异常: %s", now, json.dumps(result, ensure_ascii=False))
+                log.warning("[%s] 重试签到返回: %s", now, result.get("msg"))
+        else:
+            log.warning("[%s] 签到返回异常: %s", now, json.dumps(result, ensure_ascii=False))
 
-        except requests.exceptions.RequestException as e:
-            log.error("网络错误: %s", e)
-        except Exception as e:
-            log.error("发生错误: %s", e)
+    except requests.exceptions.RequestException as e:
+        log.error("网络错误: %s", e)
+    except Exception as e:
+        log.error("发生错误: %s", e)
 
-        # 随机等待下次签到
-        interval = random.choice(RANDOM_INTERVALS)
-        log.info("下次签到将在 %d 秒后", interval)
-        time.sleep(interval)
+    # 随机等待下次签到
+    interval = random.choice(RANDOM_INTERVALS)
+    log.info("下次签到将在 %d 秒后", interval)
+    time.sleep(interval)
 
 
 if __name__ == "__main__":
