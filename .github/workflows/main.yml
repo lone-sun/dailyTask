@@ -2,8 +2,7 @@ name: Daily Checkin
 
 on:
   schedule:
-    # 北京时间每天 11:30 执行；如果要北京时间 02:40，改成 "40 18 * * *"
-    - cron: "0 0 * * *"
+    - cron: "0 16 * * *"
   workflow_dispatch:
 
 permissions:
