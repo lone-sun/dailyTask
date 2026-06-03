@@ -2,7 +2,7 @@ name: Daily Checkin
 
 on:
   schedule:
-    - cron: "17 0,20 * * *"
+    - cron: "17 0 * * *"
   workflow_dispatch:
 
 permissions:
